@@ -15,7 +15,7 @@ block_cipher = None
 # socket.connect to block ALL outbound connections at runtime.
 NETWORK_EXCLUDES = [
     'http.server', 'http.cookiejar',
-    'ftplib', 'smtplib', 'imaplib', 'poplib', 'telnetlib',
+    'smtplib', 'imaplib', 'poplib', 'telnetlib',
     'xmlrpc', 'socketserver', 'websocket', 'requests', 'aiohttp', 'httpx',
 ]
 
