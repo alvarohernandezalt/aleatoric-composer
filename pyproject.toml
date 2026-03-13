@@ -1,0 +1,23 @@
+[project]
+name = "fundamental"
+version = "0.1.0"
+description = "Semi-aleatoric audio composition application"
+requires-python = ">=3.11"
+dependencies = [
+    "PySide6>=6.8",
+    "pedalboard>=0.9",
+    "librosa>=0.10",
+    "numpy>=1.24",
+    "scipy>=1.12",
+    "soundfile>=0.12",
+    "pydub>=0.25",
+    "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+]
+
+[project.scripts]
+fundamental = "src.main:main"
