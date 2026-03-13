@@ -4,7 +4,7 @@
 # PyInstaller build artifacts
 build/
 dist/
-*.spec
+!aleatoric_composer.spec
 
 # Python
 __pycache__/
