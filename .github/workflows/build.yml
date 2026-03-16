@@ -51,9 +51,12 @@ jobs:
       - name: Build with PyInstaller
         run: pyinstaller aleatoric_composer.spec
 
+      - name: Create macOS ZIP preserving .app bundle structure
+        run: cd dist && zip -r -y ../AleatoricComposer-macOS.zip AleatoricComposer.app
+
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
           name: AleatoricComposer-macOS
-          path: dist/AleatoricComposer.app/
+          path: AleatoricComposer-macOS.zip
           retention-days: 30
