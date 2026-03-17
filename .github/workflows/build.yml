@@ -63,29 +63,40 @@ jobs:
 
   build-macos-intel:
     runs-on: macos-latest  # ARM64 runner, cross-compile via Rosetta
+    env:
+      ARCHFLAGS: "-arch x86_64"
     steps:
       - uses: actions/checkout@v4
 
       - name: Install x86_64 Python 3.11 via Rosetta
         run: |
-          # Download and install x86_64 Python from python.org
+          # python.org universal2 installer provides both arm64 and x86_64
           curl -L -o python-installer.pkg "https://www.python.org/ftp/python/3.11.9/python-3.11.9-macos11.pkg"
           sudo installer -pkg python-installer.pkg -target /
-          # The x86_64 Python is at /usr/local/bin/python3.11
-          # Verify it's x86_64
           file /usr/local/bin/python3.11
           arch -x86_64 /usr/local/bin/python3.11 --version
 
       - name: Install dependencies (x86_64)
         run: |
           arch -x86_64 /usr/local/bin/python3.11 -m pip install --upgrade pip
-          arch -x86_64 /usr/local/bin/python3.11 -m pip install -r requirements.txt
-          arch -x86_64 /usr/local/bin/python3.11 -m pip install pyinstaller
+          # Install with only binary wheels to avoid cross-compilation issues
+          arch -x86_64 /usr/local/bin/python3.11 -m pip install \
+            --only-binary :all: \
+            --platform macosx_10_9_x86_64 \
+            --platform macosx_11_0_x86_64 \
+            --platform macosx_10_9_universal2 \
+            --platform macosx_11_0_universal2 \
+            --target /tmp/x86deps \
+            numpy scipy matplotlib librosa soundfile pydub pedalboard PySide6 pytest
+          arch -x86_64 /usr/local/bin/python3.11 -m pip install --only-binary :all: pyinstaller
+          # Add target to PYTHONPATH
+          echo "PYTHONPATH=/tmp/x86deps" >> $GITHUB_ENV
 
       - name: Build with PyInstaller (x86_64)
         run: |
+          export PYTHONPATH="/tmp/x86deps:$PYTHONPATH"
           arch -x86_64 /usr/local/bin/python3.11 -m PyInstaller aleatoric_composer.spec
-          # Verify binary is x86_64
+          # Verify binary architecture
           file dist/AleatoricComposer.app/Contents/MacOS/AleatoricComposer
 
       - name: Create macOS ZIP preserving .app bundle
