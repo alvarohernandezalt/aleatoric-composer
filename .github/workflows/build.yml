@@ -32,8 +32,8 @@ jobs:
           path: dist/AleatoricComposer/
           retention-days: 30
 
-  build-macos:
-    runs-on: macos-latest
+  build-macos-arm64:
+    runs-on: macos-latest  # Apple Silicon (M1/M2/M3/M4)
     steps:
       - uses: actions/checkout@v4
 
@@ -51,12 +51,41 @@ jobs:
       - name: Build with PyInstaller
         run: pyinstaller aleatoric_composer.spec
 
-      - name: Create macOS ZIP preserving .app bundle structure
-        run: cd dist && zip -r -y ../AleatoricComposer-macOS.zip AleatoricComposer.app
+      - name: Create macOS ZIP preserving .app bundle
+        run: cd dist && zip -r -y ../AleatoricComposer-macOS-AppleSilicon.zip AleatoricComposer.app
 
-      - name: Upload macOS artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: AleatoricComposer-macOS
-          path: AleatoricComposer-macOS.zip
+          name: AleatoricComposer-macOS-AppleSilicon
+          path: AleatoricComposer-macOS-AppleSilicon.zip
+          retention-days: 30
+
+  build-macos-intel:
+    runs-on: macos-13  # Last Intel runner
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build with PyInstaller
+        run: pyinstaller aleatoric_composer.spec
+
+      - name: Create macOS ZIP preserving .app bundle
+        run: cd dist && zip -r -y ../AleatoricComposer-macOS-Intel.zip AleatoricComposer.app
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AleatoricComposer-macOS-Intel
+          path: AleatoricComposer-macOS-Intel.zip
           retention-days: 30
