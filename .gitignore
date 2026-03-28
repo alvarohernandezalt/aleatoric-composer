@@ -5,6 +5,7 @@
 build/
 dist/
 !aleatoric_composer.spec
+AleatoricComposer.spec
 
 # Python
 __pycache__/
