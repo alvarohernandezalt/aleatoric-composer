@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>CDP Effects Cheatsheet — Aleatoric Composer v0.2</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page {
+    size: 420mm 297mm landscape;
+    margin: 0;
+  }
+  :root {
+    --amber: #FBAD17;
+    --slate: #303C42;
+    --teal: #005A65;
+    --sand: #A69C95;
+    --amber-10: #FFF8E7;
+    --amber-20: #FEEFC3;
+    --amber-40: #FDD876;
+    --amber-120: #D9920A;
+    --slate-10: #EEF0F1;
+    --slate-20: #CDD1D4;
+    --slate-80: #3D4A51;
+    --slate-120: #1E282D;
+    --teal-10: #E6F2F4;
+    --teal-20: #B3D9DE;
+    --teal-40: #4DA5B0;
+    --teal-60: #007D8C;
+    --teal-120: #003D47;
+    --sand-10: #F6F4F2;
+    --sand-20: #E5E1DE;
+    --sand-40: #C7BFB9;
+    --sand-120: #857870;
+    --bg: #F8F6F3;
+    --surface: #FFFFFF;
+    --text: #1A1F22;
+    --text-muted: #6B7780;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    width: 420mm;
+    height: 297mm;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    background: var(--slate);
+    padding: 14px 28px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    flex-shrink: 0;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: var(--amber);
+    opacity: 0.10;
+  }
+  .header-left {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+  .header-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+  }
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    line-height: 1;
+    color: #fff;
+    font-weight: 400;
+  }
+  header h1 em { color: var(--amber); font-style: italic; }
+  .header-badges {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 7.5px;
+    letter-spacing: 0.08em;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-weight: 500;
+  }
+  .badge-wav { background: var(--amber); color: var(--slate); }
+  .badge-spectral { background: var(--teal); color: #fff; }
+  .badge-synth { background: var(--sand-120); color: #fff; }
+  .badge-tv { background: rgba(255,255,255,0.12); color: var(--amber-40); border: 1px solid rgba(255,255,255,0.15); }
+  .badge-mono { background: rgba(255,255,255,0.08); color: var(--sand-40); border: 1px solid rgba(255,255,255,0.1); }
+
+  /* ===== MAIN GRID ===== */
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: auto auto auto;
+    gap: 6px;
+    padding: 8px 10px 6px;
+    min-height: 0;
+  }
+
+  /* ===== SECTION CARD ===== */
+  .section {
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(48,60,66,0.06);
+    display: flex;
+    flex-direction: column;
+  }
+  .section-hdr {
+    padding: 5px 8px 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .section-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    font-weight: 500;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .section-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 7px;
+    color: var(--text-muted);
+    margin-left: auto;
+  }
+  .section-body {
+    padding: 2px 6px 6px;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ===== EFFECT ROW ===== */
+  .fx {
+    padding: 2.5px 0;
+    border-bottom: 1px solid var(--sand-10);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5px;
+  }
+  .fx:last-child { border-bottom: none; }
+  .fx-head {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+  .fx-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 7.5px;
+    font-weight: 500;
+    color: var(--slate);
+  }
+  .fx-type {
+    font-family: 'DM Mono', monospace;
+    font-size: 6px;
+    padding: 1px 4px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .fx-type-wav { background: var(--amber-10); color: var(--amber-120); }
+  .fx-type-spectral { background: var(--teal-10); color: var(--teal); }
+  .fx-type-synth { background: var(--sand-10); color: var(--sand-120); }
+  .fx-desc {
+    font-size: 6.5px;
+    color: var(--text-muted);
+    line-height: 1.35;
+  }
+  .fx-params {
+    font-family: 'DM Mono', monospace;
+    font-size: 6px;
+    color: var(--teal-60);
+    line-height: 1.3;
+    margin-top: 1px;
+  }
+  .fx-submodes {
+    font-size: 6px;
+    color: var(--sand-120);
+    font-style: italic;
+  }
+
+  /* ===== COLOR THEMES PER SECTION ===== */
+  .sec-reverb .section-hdr { background: var(--teal-10); }
+  .sec-reverb .section-num { background: var(--teal); }
+  .sec-reverb .section-title { color: var(--teal); }
+
+  .sec-filter .section-hdr { background: #F3E5F5; }
+  .sec-filter .section-num { background: #6A1B9A; }
+  .sec-filter .section-title { color: #6A1B9A; }
+
+  .sec-distortion .section-hdr { background: #FFEBEE; }
+  .sec-distortion .section-num { background: #C0392B; }
+  .sec-distortion .section-title { color: #C0392B; }
+
+  .sec-granular .section-hdr { background: #E8F5E9; }
+  .sec-granular .section-num { background: #2E7D32; }
+  .sec-granular .section-title { color: #2E7D32; }
+
+  .sec-time .section-hdr { background: #FFF3E0; }
+  .sec-time .section-num { background: #E65100; }
+  .sec-time .section-title { color: #E65100; }
+
+  .sec-spectral .section-hdr { background: #E3F2FD; }
+  .sec-spectral .section-num { background: #1565C0; }
+  .sec-spectral .section-title { color: #1565C0; }
+
+  .sec-modulation .section-hdr { background: #E0F7FA; }
+  .sec-modulation .section-num { background: #00838F; }
+  .sec-modulation .section-title { color: #00838F; }
+
+  .sec-envelope .section-hdr { background: var(--amber-10); }
+  .sec-envelope .section-num { background: var(--amber); }
+  .sec-envelope .section-title { color: var(--amber-120); }
+
+  .sec-synthesis .section-hdr { background: var(--slate-10); }
+  .sec-synthesis .section-num { background: var(--slate); }
+  .sec-synthesis .section-title { color: var(--slate); }
+
+  .sec-spatial .section-hdr { background: #EDE7F6; }
+  .sec-spatial .section-num { background: #311B92; }
+  .sec-spatial .section-title { color: #311B92; }
+
+  .sec-other .section-hdr { background: var(--sand-10); }
+  .sec-other .section-num { background: var(--sand-120); }
+  .sec-other .section-title { color: var(--sand-120); }
+
+  .sec-quick .section-hdr { background: var(--amber-10); }
+  .sec-quick .section-num { background: var(--amber); }
+  .sec-quick .section-title { color: var(--amber-120); }
+
+  /* ===== SPANNING ===== */
+  .span-2 { grid-column: span 2; }
+  .span-3 { grid-column: span 3; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    background: var(--slate);
+    padding: 5px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  footer span {
+    font-family: 'DM Mono', monospace;
+    font-size: 7px;
+    color: var(--sand-40);
+    letter-spacing: 0.05em;
+  }
+
+  /* Quick ref table */
+  .qr-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px 6px;
+  }
+  .qr-item {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+    padding: 1.5px 0;
+  }
+  .qr-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 6px;
+    color: var(--text-muted);
+    width: 10px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .qr-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 6.5px;
+    font-weight: 500;
+    color: var(--slate);
+  }
+  .qr-desc {
+    font-size: 6px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <div>
+      <div class="header-label">Aleatoric Composer v0.2</div>
+      <h1>CDP Effects <em>Cheatsheet</em></h1>
+    </div>
+  </div>
+  <div class="header-badges">
+    <span class="badge badge-wav">WAV DIRECTO</span>
+    <span class="badge badge-spectral">SPECTRAL (specanal&rarr;pvoc)</span>
+    <span class="badge badge-synth">SYNTH</span>
+    <span class="badge badge-tv">TV = TIME-VARIABLE</span>
+    <span class="badge badge-mono">MONO = SOLO MONO</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- 1. REVERB & DELAY -->
+  <div class="section sec-reverb">
+    <div class="section-hdr">
+      <span class="section-num">1</span>
+      <span class="section-title">Reverb &amp; Delay</span>
+      <span class="section-count">8 efectos</span>
+    </div>
+    <div class="section-body">
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">reverb</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Reverb multicanal. 1-16 ch output.</div>
+        <div class="fx-params">rgain mix rvbtime absorb lpfreq trtime -c -p -H -L</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">rmverb</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Reverb con simulaci&oacute;n de sala (S/M/L).</div>
+        <div class="fx-params">rmsize rgain mix fback absorb lpfreq trtime</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">newdelay</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Delay basado en pitch con resonancia.</div>
+        <div class="fx-params">midipitch<sup>TV</sup> mix feedback</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">sfecho</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Echo simple con decaimiento.</div>
+        <div class="fx-params">delay<sup>TV</sup> attenuation<sup>TV</sup> totaldur -r rand -c cutoff</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">tapdelay</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Multi-tap delay stereo con panning.</div>
+        <div class="fx-params">tapgain feedback mix trailtime taps.txt</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">modify revecho</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Reverb/echo/resonancia integrado. 3 modos.</div>
+        <div class="fx-submodes">M1: delay est&aacute;ndar | M2: delay LFO | M3: stadium echo</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">fastconv</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Convoluci&oacute;n r&aacute;pida (IR reverb, cross-synthesis).</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">dvdwind</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Contracci&oacute;n temporal por read-skip.</div>
+        <div class="fx-params">contraction &gt;1 &middot; clipsize (ms)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. FILTER -->
+  <div class="section sec-filter">
+    <div class="section-hdr">
+      <span class="section-num">2</span>
+      <span class="section-title">Filtros</span>
+      <span class="section-count">10 efectos</span>
+    </div>
+    <div class="section-body">
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">filter fixed</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Boost/cut en frecuencia fija. 3 modos.</div>
+        <div class="fx-params">freq boost/cut bwidth(M3)</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">filter variable</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">LP/HP/BP/Notch variable.</div>
+        <div class="fx-params">acuity<sup>TV</sup> gain frq<sup>TV</sup></div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">filter lohi</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Lowpass/Highpass fijo.</div>
+        <div class="fx-params">attenuation pass-band stop-band</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">filter bank</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Banco de filtros con Q variable. 6 modos.</div>
+        <div class="fx-params">Q<sup>TV</sup> gain lof hif -s scat -d</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">filter userbank</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Banco definido por usuario (pitch/amp pairs).</div>
+        <div class="fx-params">datafile Q<sup>TV</sup> gain</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">filter varibank</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Banco variable en el tiempo.</div>
+        <div class="fx-params">data<sup>TV</sup> Q<sup>TV</sup> gain -h hcnt -r rolloff</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">filter sweeping</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Filtro con barrido. 4 modos.</div>
+        <div class="fx-params">acuity<sup>TV</sup> gain lofrq<sup>TV</sup> hifrq<sup>TV</sup> sweepfrq<sup>TV</sup></div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">filter iterated</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Filtrado iterativo con delay y pitch shift.</div>
+        <div class="fx-params">datafile Q gain delay dur -r -p -a -e</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">filter phasing</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Phaser. M1: allpass, M2: cl&aacute;sico.</div>
+        <div class="fx-params">gain delay<sup>TV</sup></div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">synfilt</span><span class="fx-type fx-type-synth">SYNTH</span></div>
+        <div class="fx-desc">S&iacute;ntesis de ruido filtrado.</div>
+        <div class="fx-params">data dur srate Q gain hcnt rolloff</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. DISTORTION -->
+  <div class="section sec-distortion">
+    <div class="section-hdr">
+      <span class="section-num">3</span>
+      <span class="section-title">Distorsi&oacute;n</span>
+      <span class="section-count">11 efectos</span>
+    </div>
+    <div class="section-body">
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">distort</span><span class="fx-type fx-type-wav">WAV/MONO</span></div>
+        <div class="fx-desc">Suite de distorsi&oacute;n por wavecycles. 21 sub-modos.</div>
+        <div class="fx-submodes">fractal &middot; harmonic &middot; multiply &middot; divide &middot; overload &middot; reform &middot; pitch &middot; envel &middot; repeat &middot; reverse &middot; shuffle &middot; delete &middot; filter &middot; interpolate &middot; telescope &middot; omit &middot; replace &middot; average &middot; pulsed &middot; interact</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">distcut</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Corta elementos con decay envelope.</div>
+        <div class="fx-params">cyclecnt exp -c limit</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">distmark</span><span class="fx-type fx-type-wav">WAV/MONO</span></div>
+        <div class="fx-desc">Interpolaci&oacute;n entre wavesets en marcas.</div>
+        <div class="fx-params">marklist unitlen<sup>TV</sup> -s tstretch -r rand</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">clip</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Recorte de se&ntilde;al. 2 modos.</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">constrict</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Acortar secciones de silencio.</div>
+        <div class="fx-params">constriction 0-200%</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">crumble</span><span class="fx-type fx-type-wav">WAV/MONO&rarr;8/16ch</span></div>
+        <div class="fx-desc">Desintegraci&oacute;n multicanal progresiva.</div>
+        <div class="fx-params">stt dur1 dur2 dur3 size<sup>TV</sup> rand<sup>TV</sup> pscat<sup>TV</sup></div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">bounce</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Rebotes con aceleraci&oacute;n y decay.</div>
+        <div class="fx-params">count startgap shorten endlevel ewarp -s min</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">splinter</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Astillas repetidas y encogidas de wavesets.</div>
+        <div class="fx-params">target wcnt shrcnt ocnt p1 p2 -f frq</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">shrink</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Repite acortando progresivamente. 6 modos.</div>
+        <div class="fx-params">shrinkage gap contract dur</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">quirk</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Distorsi&oacute;n por potencia de muestras.</div>
+        <div class="fx-params">powfac 0.01-100</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">scramble</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Reordena wavesets. 10 modos.</div>
+        <div class="fx-params">-c cnt -t trns<sup>TV</sup> -a atten<sup>TV</sup> seed</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. GRANULAR -->
+  <div class="section sec-granular">
+    <div class="section-hdr">
+      <span class="section-num">4</span>
+      <span class="section-title">Granular</span>
+      <span class="section-count">9 efectos</span>
+    </div>
+    <div class="section-body">
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">grain</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Suite de operaciones sobre granos. 16 sub-modos.</div>
+        <div class="fx-submodes">omit &middot; repitch &middot; timewarp &middot; duplicate &middot; rerhythm &middot; reverse &middot; reposition &middot; reorder &middot; remotif &middot; r_extend &middot; grev &middot; noise_extend &middot; align</div>
+        <div class="fx-params">-l gate<sup>TV</sup> -h minhole -b len -t winsize</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">grainex</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Extiende zona de granos.</div>
+        <div class="fx-params">wsiz trof plus stt end</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">grnmill</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Granulador completo (tama&ntilde;o, densidad, pitch, amp, espacio).</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">hover</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Lectura zigzag a frecuencia dada.</div>
+        <div class="fx-params">frq<sup>TV</sup> loc<sup>TV</sup> frqrand<sup>TV</sup> locrand<sup>TV</sup> splice dur</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">hover2</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Zigzag desde zero-crossings (waveforms sim&eacute;tricas).</div>
+        <div class="fx-params">frq<sup>TV</sup> loc<sup>TV</sup> frqrand<sup>TV</sup> locrand<sup>TV</sup> dur</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">stutter</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Corta en s&iacute;labas y reordena.</div>
+        <div class="fx-params">datafile dur segjoins silprop silmin silmax seed -t -a -b</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">packet</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">A&iacute;sla/genera paquetes de onda.</div>
+        <div class="fx-params">times narrowing 0-1000 centring -1&ndash;1</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">wrappage</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Reconstituci&oacute;n granular multicanal (Wishart).</div>
+        <div class="fx-params">outchans centre<sup>TV</sup> spread<sup>TV</sup> veloc<sup>TV</sup> dens<sup>TV</sup> gsize<sup>TV</sup> pshift<sup>TV</sup> amp<sup>TV</sup> bsplice<sup>TV</sup> esplice<sup>TV</sup> range<sup>TV</sup> jitter<sup>TV</sup></div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">modify brassage</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Brassage granular de Wishart. Control completo.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. TIME & PITCH -->
+  <div class="section sec-time">
+    <div class="section-hdr">
+      <span class="section-num">5</span>
+      <span class="section-title">Tiempo &amp; Pitch</span>
+      <span class="section-count">5 efectos</span>
+    </div>
+    <div class="section-body">
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">modify speed</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Cambio de velocidad/pitch. 4 modos.</div>
+        <div class="fx-submodes">M1: multiplicador | M2: semitonos | M5: accel/decel | M6: vibrato</div>
+        <div class="fx-params">speed<sup>TV</sup> semitone<sup>TV</sup> accel vibrate<sup>TV</sup> vibdepth<sup>TV</sup></div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">strans multi</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Speed/pitch multicanal. 4 modos.</div>
+        <div class="fx-params">speed<sup>TV</sup> semitone<sup>TV</sup> accel vibfrq<sup>TV</sup></div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">retime</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Ajuste r&iacute;tmico de eventos. 14 modos.</div>
+        <div class="fx-submodes">pulse &middot; timestretch &middot; speed &middot; beats &middot; repeat-a-tempo &middot; etc.</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">psow</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Operaciones pitch-s&iacute;ncronas (FOFs). 12 sub-modos.</div>
+        <div class="fx-submodes">stretch &middot; dupl &middot; delete &middot; strtrans &middot; grab &middot; sustain &middot; chop &middot; interp &middot; synth &middot; impose &middot; space &middot; reinforce</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">tweet</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Reemplaza FOFs vocales por tweets/ruido. 3 modos.</div>
+        <div class="fx-params">pitchdata minlevel pkcnt frq chirp</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. SPECTRAL -->
+  <div class="section sec-spectral">
+    <div class="section-hdr">
+      <span class="section-num">6</span>
+      <span class="section-title">Spectral</span>
+      <span class="section-count">11 efectos</span>
+    </div>
+    <div class="section-body">
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">blur</span><span class="fx-type fx-type-spectral">SPECTRAL</span></div>
+        <div class="fx-desc">Difuminado espectral. 10 sub-modos.</div>
+        <div class="fx-submodes">avrg &middot; blur &middot; suppress &middot; chorus &middot; drunk &middot; shuffle &middot; weave &middot; noise &middot; scatter &middot; spread</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">morph</span><span class="fx-type fx-type-spectral">SPECTRAL 2in</span></div>
+        <div class="fx-desc">Morphing entre espectros.</div>
+        <div class="fx-submodes">glide &middot; bridge &middot; morph</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">newmorph</span><span class="fx-type fx-type-spectral">SPECTRAL 2in</span></div>
+        <div class="fx-desc">Nuevos tipos de morphing espectral.</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">focus</span><span class="fx-type fx-type-spectral">SPECTRAL</span></div>
+        <div class="fx-desc">Enfoque espectral. 7 sub-modos.</div>
+        <div class="fx-submodes">accu &middot; exag &middot; focus &middot; fold &middot; freeze &middot; hold &middot; step</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">hilite</span><span class="fx-type fx-type-spectral">SPECTRAL</span></div>
+        <div class="fx-desc">Resaltado espectral. 8 sub-modos.</div>
+        <div class="fx-submodes">filter &middot; greq &middot; band &middot; arpeg &middot; pluck &middot; trace &middot; bltr &middot; vowels</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">specfnu</span><span class="fx-type fx-type-spectral">SPECTRAL</span></div>
+        <div class="fx-desc">Manipulaci&oacute;n de formantes. 23 modos.</div>
+        <div class="fx-submodes">narrow &middot; compress &middot; invert &middot; rotate &middot; negative &middot; arpeg &middot; octshift &middot; transpose &middot; respace &middot; randpitch &middot; sine-speech...</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">specfold</span><span class="fx-type fx-type-spectral">SPECTRAL</span></div>
+        <div class="fx-desc">Plegar/invertir/randomizar espectro. 3 modos.</div>
+        <div class="fx-params">stt len cnt seed</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">specsphinx</span><span class="fx-type fx-type-spectral">SPECTRAL 2in</span></div>
+        <div class="fx-desc">Cross-spectral (imposici&oacute;n/multiplicaci&oacute;n).</div>
+        <div class="fx-params">-a ampbalance -f frqbalance -b bias -g gain</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">spectstr</span><span class="fx-type fx-type-spectral">SPECTRAL</span></div>
+        <div class="fx-desc">Time-stretch espectral anti-artefactos.</div>
+        <div class="fx-params">timestretch<sup>TV</sup> d-ratio di-rand</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">spectwin</span><span class="fx-type fx-type-spectral">SPECTRAL 2in</span></div>
+        <div class="fx-desc">Interpolaci&oacute;n entre 2 espectros.</div>
+        <div class="fx-params">-f frqint -e envint -d dupl -s step</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">stretch</span><span class="fx-type fx-type-spectral">SPECTRAL</span></div>
+        <div class="fx-desc">Stretch de frecuencias y temporal.</div>
+        <div class="fx-submodes">spectrum 1/2 &middot; time 1</div>
+        <div class="fx-params">frq_divide maxstretch exponent -d depth timestretch<sup>TV</sup></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. MODULATION & TREMOLO -->
+  <div class="section sec-modulation">
+    <div class="section-hdr">
+      <span class="section-num">7</span>
+      <span class="section-title">Modulaci&oacute;n &amp; Tremolo</span>
+      <span class="section-count">5 efectos</span>
+    </div>
+    <div class="section-body">
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">tremolo</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Tremolo con narrowing.</div>
+        <div class="fx-params">frq<sup>TV</sup> 0-500Hz &middot; depth<sup>TV</sup> &middot; gain<sup>TV</sup> &middot; fineness</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">tremenv</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Tremolo post-peak del envelope.</div>
+        <div class="fx-params">frq depth winsize fineness</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">flutter</span><span class="fx-type fx-type-wav">WAV MCH</span></div>
+        <div class="fx-desc">Tremulaci&oacute;n multicanal.</div>
+        <div class="fx-params">chanseq freq<sup>TV</sup> depth<sup>TV</sup> gain</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">phasor</span><span class="fx-type fx-type-wav">WAV/MONO</span></div>
+        <div class="fx-desc">Phasing por m&uacute;ltiples streams.</div>
+        <div class="fx-params">streams 2-8 &middot; phasfrq<sup>TV</sup> &middot; shift<sup>TV</sup> 0-12st &middot; ochans -o offset</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">rotor</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Sets de notas con rango/velocidad variable.</div>
+        <div class="fx-params">cnt minp maxp step prot trot phas dur</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. ENVELOPE -->
+  <div class="section sec-envelope">
+    <div class="section-hdr">
+      <span class="section-num">8</span>
+      <span class="section-title">Envelope</span>
+      <span class="section-count">10 efectos</span>
+    </div>
+    <div class="section-body">
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">envel warp</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Deformaci&oacute;n de envelope. 15 modos.</div>
+        <div class="fx-submodes">normalise &middot; reverse &middot; exaggerate &middot; attenuate &middot; lift &middot; timestretch &middot; flatten &middot; gate &middot; invert &middot; limit &middot; corrugate &middot; expand &middot; trigger &middot; ceiling &middot; ducked</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">envel impose</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Imponer envelope. 4 fuentes.</div>
+        <div class="fx-submodes">soundfile &middot; binary &middot; breakpoint 0-1 &middot; breakpoint dB</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">envel replace</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Reemplazar envelope (mismos 4 modos).</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">envel tremolo</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Tremolo por modulaci&oacute;n de envelope.</div>
+        <div class="fx-params">frq<sup>TV</sup> depth<sup>TV</sup> gain<sup>TV</sup></div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">envel attack</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Enfatizar ataque.</div>
+        <div class="fx-params">gain onset 5-32767ms decay</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">envel dovetail</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Fade-in/out configurable.</div>
+        <div class="fx-params">infadedur outfadedur intype outtype (0=lin 1=exp)</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">envel pluck</span><span class="fx-type fx-type-wav">WAV/MONO</span></div>
+        <div class="fx-desc">Ataque de pluck.</div>
+        <div class="fx-params">startsamp wavelen -a atkcycles -d decayrate</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">envcut</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Cortar con envelope descendente.</div>
+        <div class="fx-params">envlen attack exp</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">envspeak</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Procesamiento de s&iacute;labas. 25 modos.</div>
+        <div class="fx-submodes">repeat &middot; reverse-repeat &middot; attenuate &middot; shrink &middot; divide &middot; extract &middot; reorder...</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">gate</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Puerta de ruido. 2 modos.</div>
+        <div class="fx-params">gatelevel 0 a -96dB</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. SYNTHESIS -->
+  <div class="section sec-synthesis">
+    <div class="section-hdr">
+      <span class="section-num">9</span>
+      <span class="section-title">S&iacute;ntesis</span>
+      <span class="section-count">8 efectos</span>
+    </div>
+    <div class="section-body">
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">brownian</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Textura browniana desde source.</div>
+        <div class="fx-params">chans dur att<sup>TV</sup> dec<sup>TV</sup> plo<sup>TV</sup> phi<sup>TV</sup> step<sup>TV</sup> sstep<sup>TV</sup> tick<sup>TV</sup></div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">chirikov</span><span class="fx-type fx-type-synth">SYNTH</span></div>
+        <div class="fx-desc">Mapas ca&oacute;ticos (Standard/Circle).</div>
+        <div class="fx-params">dur frq<sup>TV</sup> damping<sup>TV</sup> srate</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">crystal</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Eventos desde cristal rotante 3D.</div>
+        <div class="fx-params">vdat rota rotb twidth tstep plo phi</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">cascade</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Echo-cascada de segmentos.</div>
+        <div class="fx-params">clipsize<sup>TV</sup> echos<sup>TV</sup> -r rand<sup>TV</sup> -N shredno<sup>TV</sup></div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">cantor</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Conjunto de Cantor (fractal).</div>
+        <div class="fx-params">holesize holedig maxdur</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">fractal</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Fractalizaci&oacute;n de sonido.</div>
+        <div class="fx-params">layers -s splicelen</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">motor</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Pulsos r&aacute;pidos dentro de pulsos lentos.</div>
+        <div class="fx-params">dur freq pulse fratio pratio sym -j jitter -t tremor</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">synspline</span><span class="fx-type fx-type-synth">SYNTH</span></div>
+        <div class="fx-desc">S&iacute;ntesis por splines aleatorios.</div>
+        <div class="fx-params">frq<sup>TV</sup> splinecnt<sup>TV</sup> interpval<sup>TV</sup> -d pdrift -v driftrate</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. SPATIAL & MIXING -->
+  <div class="section sec-spatial">
+    <div class="section-hdr">
+      <span class="section-num">10</span>
+      <span class="section-title">Espacial &amp; Mixing</span>
+      <span class="section-count">8 efectos</span>
+    </div>
+    <div class="section-body">
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">mchanpan</span><span class="fx-type fx-type-wav">WAV/MONO&rarr;MCH</span></div>
+        <div class="fx-desc">Pan multicanal. 10 modos.</div>
+        <div class="fx-submodes">positions &middot; switch &middot; spread-step &middot; spread-gradual &middot; antifonal &middot; pan-config &middot; rotaci&oacute;n &middot; switch-rand</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">mchanrev</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Ecos/reverb multicanal (stadium).</div>
+        <div class="fx-params">gain roll_off size count centre spread</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">mchiter</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Iteraci&oacute;n multicanal fluida.</div>
+        <div class="fx-params">outchans -d delay -r rand -p pshift -a ampcut -f fade</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">mchshred</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Shred multicanal.</div>
+        <div class="fx-params">repeats chunklen scatter</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">mchzig</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Zigzag con pan aleatorio.</div>
+        <div class="fx-params">start end dur minzig outchans</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">panorama</span><span class="fx-type fx-type-wav">WAV MONO</span></div>
+        <div class="fx-desc">Distribuye monos en panorama espacial.</div>
+        <div class="fx-params">lspk_cnt lspk_aw sounds_aw -r rand</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">modify space</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Espacio stereo. 3 modos.</div>
+        <div class="fx-submodes">M1: pan mono&rarr;stereo | M2: mirror | M4: narrow</div>
+        <div class="fx-params">pan<sup>TV</sup> narrowing -p prescale</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">texmchan</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Textura multicanal sobre campos arm&oacute;nicos.</div>
+        <div class="fx-params">notedata outdur packing scatter mingain maxgain mindur maxdur minpich maxpich outchans -s spread</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. OTHER EFFECTS -->
+  <div class="section sec-other">
+    <div class="section-hdr">
+      <span class="section-num">11</span>
+      <span class="section-title">Otros Efectos</span>
+      <span class="section-count">7 efectos</span>
+    </div>
+    <div class="section-body">
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">flatten</span><span class="fx-type fx-type-wav">WAV/MONO</span></div>
+        <div class="fx-desc">Ecualizar nivel de elementos.</div>
+        <div class="fx-params">elementsize 0.001-100s &middot; shoulder 20ms-elementsize/2</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">isolate</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Cortar segmentos manteniendo timing. 5 modos.</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">manysil</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Insertar silencios en tiempos dados.</div>
+        <div class="fx-params">silencedata splicelen</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">repeater</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Repetir elementos con aceleraci&oacute;n/bounce.</div>
+        <div class="fx-params">datafile -r rand<sup>TV</sup> -p prand<sup>TV</sup> accel warp fade</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">shifter</span><span class="fx-type fx-type-wav">WAV</span></div>
+        <div class="fx-desc">Ciclos de repetici&oacute;n con foco cambiante.</div>
+        <div class="fx-params">cycles cycdur dur ochans linger transit boost</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">frame</span><span class="fx-type fx-type-wav">WAV MCH</span></div>
+        <div class="fx-desc">Manipulaci&oacute;n de canales. 6 modos.</div>
+        <div class="fx-submodes">rotate &middot; rotate-pair &middot; reassign &middot; mirror &middot; swap &middot; envelope-ind</div>
+      </div>
+      <div class="fx">
+        <div class="fx-head"><span class="fx-name">glisten</span><span class="fx-type fx-type-spectral">SPECTRAL</span></div>
+        <div class="fx-desc">Partici&oacute;n aleatoria del espectro.</div>
+        <div class="fx-params">grpdiv setdur -p pitchshift -d durrand</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12. QUICK REFERENCE -->
+  <div class="section sec-quick span-2">
+    <div class="section-hdr">
+      <span class="section-num" style="background:var(--amber);">&#9733;</span>
+      <span class="section-title" style="color:var(--amber-120);">Top 30 WAV Directos + 11 Spectral &mdash; Referencia R&aacute;pida</span>
+    </div>
+    <div class="section-body">
+      <div class="qr-grid">
+        <div class="qr-item"><span class="qr-num">1</span><span class="qr-name">reverb</span><span class="qr-desc">Reverb multicanal</span></div>
+        <div class="qr-item"><span class="qr-num">2</span><span class="qr-name">rmverb</span><span class="qr-desc">Reverb con sala</span></div>
+        <div class="qr-item"><span class="qr-num">3</span><span class="qr-name">sfecho</span><span class="qr-desc">Echo simple</span></div>
+        <div class="qr-item"><span class="qr-num">4</span><span class="qr-name">tapdelay</span><span class="qr-desc">Multi-tap stereo</span></div>
+        <div class="qr-item"><span class="qr-num">5</span><span class="qr-name">filter variable</span><span class="qr-desc">LP/HP/BP/Notch</span></div>
+        <div class="qr-item"><span class="qr-num">6</span><span class="qr-name">filter sweeping</span><span class="qr-desc">Filtro con sweep</span></div>
+        <div class="qr-item"><span class="qr-num">7</span><span class="qr-name">filter phasing</span><span class="qr-desc">Phaser</span></div>
+        <div class="qr-item"><span class="qr-num">8</span><span class="qr-name">tremolo</span><span class="qr-desc">Tremolo</span></div>
+        <div class="qr-item"><span class="qr-num">9</span><span class="qr-name">distort fractal</span><span class="qr-desc">Dist. fractal</span></div>
+        <div class="qr-item"><span class="qr-num">10</span><span class="qr-name">distort reform</span><span class="qr-desc">Waveshape (8)</span></div>
+        <div class="qr-item"><span class="qr-num">11</span><span class="qr-name">distort pitch</span><span class="qr-desc">Transpone wavecycles</span></div>
+        <div class="qr-item"><span class="qr-num">12</span><span class="qr-name">bounce</span><span class="qr-desc">Rebotes acelerados</span></div>
+        <div class="qr-item"><span class="qr-num">13</span><span class="qr-name">clip</span><span class="qr-desc">Recorte de se&ntilde;al</span></div>
+        <div class="qr-item"><span class="qr-num">14</span><span class="qr-name">gate</span><span class="qr-desc">Puerta de ruido</span></div>
+        <div class="qr-item"><span class="qr-num">15</span><span class="qr-name">envel dovetail</span><span class="qr-desc">Fade in/out</span></div>
+        <div class="qr-item"><span class="qr-num">16</span><span class="qr-name">envel attack</span><span class="qr-desc">Enfatizar ataque</span></div>
+        <div class="qr-item"><span class="qr-num">17</span><span class="qr-name">envel warp</span><span class="qr-desc">15 deformaciones</span></div>
+        <div class="qr-item"><span class="qr-num">18</span><span class="qr-name">modify speed</span><span class="qr-desc">Pitch/speed</span></div>
+        <div class="qr-item"><span class="qr-num">19</span><span class="qr-name">modify space</span><span class="qr-desc">Pan stereo</span></div>
+        <div class="qr-item"><span class="qr-num">20</span><span class="qr-name">hover</span><span class="qr-desc">Zigzag granular</span></div>
+        <div class="qr-item"><span class="qr-num">21</span><span class="qr-name">stutter</span><span class="qr-desc">Tartamudeo</span></div>
+        <div class="qr-item"><span class="qr-num">22</span><span class="qr-name">grain omit</span><span class="qr-desc">Omitir granos</span></div>
+        <div class="qr-item"><span class="qr-num">23</span><span class="qr-name">grain timewarp</span><span class="qr-desc">Stretch granos</span></div>
+        <div class="qr-item"><span class="qr-num">24</span><span class="qr-name">grain reverse</span><span class="qr-desc">Invertir granos</span></div>
+        <div class="qr-item"><span class="qr-num">25</span><span class="qr-name">wrappage</span><span class="qr-desc">Granul. multicanal</span></div>
+        <div class="qr-item"><span class="qr-num">26</span><span class="qr-name">scramble</span><span class="qr-desc">Reordenar wavesets</span></div>
+        <div class="qr-item"><span class="qr-num">27</span><span class="qr-name">constrict</span><span class="qr-desc">Acortar silencios</span></div>
+        <div class="qr-item"><span class="qr-num">28</span><span class="qr-name">quirk</span><span class="qr-desc">Dist. potencia</span></div>
+        <div class="qr-item"><span class="qr-num">29</span><span class="qr-name">fractal</span><span class="qr-desc">Capas fractales</span></div>
+        <div class="qr-item"><span class="qr-num">30</span><span class="qr-name">dvdwind</span><span class="qr-desc">Contracci&oacute;n read-skip</span></div>
+        <div class="qr-item" style="border-top:1px solid var(--teal-20);padding-top:3px;"><span class="qr-num" style="color:var(--teal);">31</span><span class="qr-name" style="color:var(--teal);">blur (10)</span><span class="qr-desc">Difuminado spectral</span></div>
+        <div class="qr-item" style="border-top:1px solid var(--teal-20);padding-top:3px;"><span class="qr-num" style="color:var(--teal);">32</span><span class="qr-name" style="color:var(--teal);">morph</span><span class="qr-desc">Morphing espectros</span></div>
+        <div class="qr-item" style="border-top:1px solid var(--teal-20);padding-top:3px;"><span class="qr-num" style="color:var(--teal);">33</span><span class="qr-name" style="color:var(--teal);">focus (7)</span><span class="qr-desc">Enfoque spectral</span></div>
+        <div class="qr-item"><span class="qr-num" style="color:var(--teal);">34</span><span class="qr-name" style="color:var(--teal);">hilite (8)</span><span class="qr-desc">Resaltado spectral</span></div>
+        <div class="qr-item"><span class="qr-num" style="color:var(--teal);">35</span><span class="qr-name" style="color:var(--teal);">specfnu (23)</span><span class="qr-desc">Formantes</span></div>
+        <div class="qr-item"><span class="qr-num" style="color:var(--teal);">36</span><span class="qr-name" style="color:var(--teal);">specfold</span><span class="qr-desc">Plegar espectro</span></div>
+        <div class="qr-item"><span class="qr-num" style="color:var(--teal);">37</span><span class="qr-name" style="color:var(--teal);">specsphinx</span><span class="qr-desc">Cross-spectral</span></div>
+        <div class="qr-item"><span class="qr-num" style="color:var(--teal);">38</span><span class="qr-name" style="color:var(--teal);">spectstr</span><span class="qr-desc">Time-stretch spectral</span></div>
+        <div class="qr-item"><span class="qr-num" style="color:var(--teal);">39</span><span class="qr-name" style="color:var(--teal);">spectwin</span><span class="qr-desc">Interpolaci&oacute;n spectral</span></div>
+        <div class="qr-item"><span class="qr-num" style="color:var(--teal);">40</span><span class="qr-name" style="color:var(--teal);">stretch</span><span class="qr-desc">Stretch freq/tiempo</span></div>
+        <div class="qr-item"><span class="qr-num" style="color:var(--teal);">41</span><span class="qr-name" style="color:var(--teal);">glisten</span><span class="qr-desc">Partici&oacute;n aleatoria</span></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <span>CDP RELEASE 8 &mdash; COMPOSER'S DESKTOP PROJECT (TREVOR WISHART ET AL.)</span>
+  <span>ALEATORIC COMPOSER v0.2 &mdash; 82 EFECTOS &middot; 11 CATEGOR&Iacute;AS &middot; ~200 SUB-MODOS</span>
+  <span>A3 LANDSCAPE &mdash; 420&times;297mm</span>
+</footer>
+
+</body>
+</html>

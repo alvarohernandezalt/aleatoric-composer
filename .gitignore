@@ -36,3 +36,13 @@ dist-macos*/
 docs/
 *.pdf
 GUI_LAYOUT_ACTUAL.png
+
+# Design assets (internal)
+.design/
+
+# CDP binaries (external tools)
+_cdp/
+
+# draw.io temp files
+.$*.bkp
+.$*.dtmp
