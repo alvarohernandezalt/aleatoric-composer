@@ -36,6 +36,9 @@ dist-macos*/
 *.pdf
 GUI_LAYOUT_ACTUAL.png
 
+# Working maps and internal artifacts
+docs/_working_maps/
+
 # Design assets (internal)
 .design/
 
